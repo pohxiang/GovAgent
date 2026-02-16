@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:firebase_ai/firebase_ai.dart';
 import 'package:gov_agent/config/app_config.dart';
 import 'package:gov_agent/models/tool_call.dart' as model;
+import 'package:gov_agent/main.dart' show firebaseInitialized;
 import 'package:gov_agent/models/transcript_entry.dart';
 
 class GeminiLiveService {
@@ -67,6 +68,13 @@ class GeminiLiveService {
   ];
 
   Future<void> connect() async {
+    if (!firebaseInitialized) {
+      throw Exception(
+        'Firebase is not configured. To use Gemini voice features, '
+        'set up a Firebase project and add google-services.json.',
+      );
+    }
+
     final liveModel = FirebaseAI.googleAI().liveGenerativeModel(
       model: AppConfig.geminiModel,
       liveGenerationConfig: LiveGenerationConfig(

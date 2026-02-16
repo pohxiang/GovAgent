@@ -136,12 +136,15 @@ We need the **Gemini Live API** — the bidirectional streaming API where you se
 ## Gotchas & Known Issues
 
 ### Firebase
-- The app will crash on startup if Firebase config files are missing. If you just want to work on UI without Firebase, you need to stub out `Firebase.initializeApp()` in `main.dart`.
+- `Firebase.initializeApp()` in `main.dart` is wrapped in a try-catch. If Firebase isn't configured, the app runs in UI-only mode (`firebaseInitialized = false`). `GeminiLiveService.connect()` checks this flag and throws a descriptive error instead of crashing.
+- **Android build requires the Google Services Gradle plugin** (`com.google.gms.google-services`) in both `android/settings.gradle.kts` (declaration) and `android/app/build.gradle.kts` (application). Without it, the Gradle build fails even if `google-services.json` exists.
+- **`android/app/google-services.json` must exist** for the Android build to pass. A dummy placeholder is checked in for development. Replace it with the real file from Firebase Console when you set up a Firebase project. The `package_name` inside it must match the `applicationId` in `build.gradle.kts` (`com.example.gov_agent`).
 - `firebase_ai` `LiveSession` is still in Preview. The API surface may change across minor versions. If you upgrade `firebase_ai`, re-check `gemini_live_service.dart` — specifically `receive()`, `sendAudioRealtime()`, and the `LiveServerContent`/`LiveServerToolCall` message types.
 
 ### Audio
 - `flutter_soloud` requires native compilation — it won't work in `flutter test` or on web. Tests that touch `AudioPlaybackService` need mocking.
 - `record` package needs a real device or simulator with mic access. Emulators without mic support will throw.
+- **`record_linux` version mismatch** — `record 5.x` can pull in an old `record_linux` that's incompatible with `record_platform_interface`. Dart compiles all platform implementations even when targeting Android, so this breaks the build. Fixed via `dependency_overrides: record_linux: ^1.3.0` in `pubspec.yaml`. If you upgrade `record`, check that all federated platform packages resolve to compatible versions (`flutter pub deps | grep record`).
 - Android `minSdk` is set to 24 (required by `record`). Don't lower it.
 
 ### Platform Permissions

@@ -43,3 +43,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase config files
+# NOTE: google-services.json is tracked as a dummy placeholder for builds.
+# Replace it with your real config from Firebase Console.
+**/GoogleService-Info.plist

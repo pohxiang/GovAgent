@@ -86,6 +86,15 @@ class HomeScreen extends ConsumerWidget {
       Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => const SessionScreen()),
       );
+    } else if (state == SessionState.error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Could not start session. Firebase may not be configured.',
+          ),
+          duration: Duration(seconds: 4),
+        ),
+      );
     }
   }
 }
